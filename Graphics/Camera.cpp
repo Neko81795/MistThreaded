@@ -6,20 +6,26 @@ namespace Graphics
 	Camera::Camera(GraphicsEngine & graphics) : Graphics(graphics), CameraBuffer(graphics, ShaderType::Vertex, 0)
 	{
 		FOV = DirectX::XMConvertToRadians(70);
-		Near = 0.01f;
+		Near = 0.01;
 		Far = 1000;
 		Look = Vector4(0, 0, -1, 0);
 
 		CreateCameraViewMatrix();
 		auto& mat = CameraBuffer.GetDataForWrite();
-		Projection = DirectX::XMMatrixPerspectiveFovRH(FOV, graphics.Win.Width / static_cast<float>(graphics.Win.Height), Near, Far);
+		Projection = DirectX::XMMatrixPerspectiveFovRH(static_cast<float>(FOV)
+			, graphics.Win.Width / static_cast<float>(graphics.Win.Height)
+			, static_cast<float>(Near)
+			, static_cast<float>(Far));
 		mat.ViewProjection = mat.View * Projection;
 	}
 
 	void Camera::UpdateSize()
 	{
 		auto& mat = CameraBuffer.GetDataForWrite();
-		Projection = DirectX::XMMatrixPerspectiveFovRH(FOV, Graphics.Win.Width / static_cast<float>(Graphics.Win.Height), Near, Far);
+		Projection = DirectX::XMMatrixPerspectiveFovRH(static_cast<float>(FOV)
+			, Graphics.Win.Width / static_cast<float>(Graphics.Win.Height)
+			, static_cast<float>(Near)
+			, static_cast<float>(Far));
 		mat.ViewProjection = mat.View * Projection;
 	}
 
@@ -33,32 +39,41 @@ namespace Graphics
 
 	void Camera::SetLook(Vector4 look)
 	{
-		Look = look.Normalize();
+		Look = look.Normalized();
 		CreateCameraViewMatrix();
 		auto& mat = CameraBuffer.GetDataForWrite();
 		mat.ViewProjection = mat.View * Projection;
 	}
 
-	void Camera::SetFOV(float fov)
+	void Camera::SetFOV(double fov)
 	{
 		FOV = fov;
 		auto& mat = CameraBuffer.GetDataForWrite();
-		Projection = DirectX::XMMatrixPerspectiveFovRH(FOV, Graphics.Win.Width / static_cast<float>(Graphics.Win.Height), Near, Far);
+		Projection = DirectX::XMMatrixPerspectiveFovRH(static_cast<float>(FOV)
+			, Graphics.Win.Width / static_cast<float>(Graphics.Win.Height)
+			, static_cast<float>(Near)
+			, static_cast<float>(Far));
 		mat.ViewProjection = mat.View * Projection;
 	}
-	void Camera::SetNearPlane(float n)
+	void Camera::SetNearPlane(double n)
 	{
 		Near = n;
 		auto& mat = CameraBuffer.GetDataForWrite();
-		Projection = DirectX::XMMatrixPerspectiveFovRH(FOV, Graphics.Win.Width / static_cast<float>(Graphics.Win.Height), Near, Far);
+		Projection = DirectX::XMMatrixPerspectiveFovRH(static_cast<float>(FOV)
+			, Graphics.Win.Width / static_cast<float>(Graphics.Win.Height)
+			, static_cast<float>(Near)
+			, static_cast<float>(Far));
 		mat.ViewProjection = mat.View * Projection;
 	}
 
-	void Camera::SetFarPlane(float f)
+	void Camera::SetFarPlane(double f)
 	{
 		Far = f;
 		auto& mat = CameraBuffer.GetDataForWrite();
-		Projection = DirectX::XMMatrixPerspectiveFovRH(FOV, Graphics.Win.Width / static_cast<float>(Graphics.Win.Height), Near, Far);
+		Projection = DirectX::XMMatrixPerspectiveFovRH(static_cast<float>(FOV)
+			, Graphics.Win.Width / static_cast<float>(Graphics.Win.Height)
+			, static_cast<float>(Near)
+			, static_cast<float>(Far));
 		mat.ViewProjection = mat.View * Projection;
 	}
 
@@ -72,17 +87,17 @@ namespace Graphics
 		return Look;
 	}
 
-	float Camera::GetFOV() const
+	double Camera::GetFOV() const
 	{
 		return FOV;
 	}
 
-	float Camera::GetNearPlane() const
+	double Camera::GetNearPlane() const
 	{
 		return Near;
 	}
 
-	float Camera::GetFarPlane() const
+	double Camera::GetFarPlane() const
 	{
 		return Far;
 	}
@@ -97,9 +112,9 @@ namespace Graphics
 		auto& mat = CameraBuffer.GetDataForWrite();
 
 		Vector4 up(0, 1, 0, 0);
-		Vector4 right = Look.Cross(up).Normalize();
-		up = right.Cross(Look).Normalize();
-		
+		Vector4 right = Look.Cross(up).Normalized();
+		up = right.Cross(Look).Normalized();
+
 		/*mat.View = DirectX::XMMatrixSet(
 			right.X, up.X, Look.X, Position.X,
 			right.Y, up.Y, Look.Y, Position.Y,
@@ -108,10 +123,10 @@ namespace Graphics
 		);*/
 
 		mat.View = DirectX::XMMatrixSet(
-			right.X, right.Y, -right.Z, 0,
-			up.X, up.Y, -up.Z, 0,
-			Look.X, Look.Y, -Look.Z, 0,
-			Position.X, Position.Y, Position.Z, 1
+			static_cast<float>(right.X), static_cast<float>(right.Y), static_cast<float>(-right.Z), 0,
+			static_cast<float>(up.X), static_cast<float>(up.Y), static_cast<float>(-up.Z), 0,
+			static_cast<float>(Look.X), static_cast<float>(Look.Y), static_cast<float>(-Look.Z), 0,
+			static_cast<float>(Position.X), static_cast<float>(Position.Y), static_cast<float>(Position.Z), 1
 		);
 
 		mat.View = DirectX::XMMatrixInverse(
